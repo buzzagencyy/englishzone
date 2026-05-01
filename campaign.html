@@ -1553,8 +1553,10 @@ function renderPosts(){
                       <div class="comment-meta">
                         <strong>${et(c.by||"User")}</strong>
                         <span>${et(c.date||"")}</span>
-                        ${c.by===(currentUser?.username||"") ? `<button type="button" data-del-post-comment="${i}" data-idx="${ci}">حذف</button>` : ""}
-                      </div>
+${(c.by === (currentUser?.username || "") || IS_SUPER_ADMIN) 
+  ? `<button type="button" data-del-post-comment="${i}" data-idx="${ci}">حذف</button>` 
+  : ""}
+  </div>
                       <div class="comment-text">${et(c.text||"")}</div>
                     </div>
                   </div>`).join("")}
@@ -1746,7 +1748,10 @@ document.addEventListener("click", function(e){
     const i   = +delComment;
     const idx = +t.dataset.idx;
     const comment = D.posts[i].comments[idx];
-    if(comment.by !== (currentUser?.username||"")){ setStatus("مش مسموح لك تحذف الكومنت ده ❌","bad"); return; }
+if(comment.by !== (currentUser?.username||"") && !IS_SUPER_ADMIN){
+  setStatus("مش مسموح لك تحذف الكومنت ده ❌","bad");
+  return;
+}
     D.posts[i].comments.splice(idx,1);
     renderPosts(); updateJsonOutput();
     saveData();
